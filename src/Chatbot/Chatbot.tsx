@@ -1,4 +1,5 @@
 // general
+import React, { useEffect } from "react";
 import { ToastContainer } from "react-toastify";
 
 // components
@@ -26,6 +27,20 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
   const chatbotOpen = useSelector(
     (state: RootState) => state.chatbot.chatbotOpen
   );
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/default");
+      const text = await response.text();
+      console.log(text);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  });
   return (
     <>
       <ToastContainer />
