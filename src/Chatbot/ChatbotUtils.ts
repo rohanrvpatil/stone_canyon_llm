@@ -1,4 +1,5 @@
 import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // type FetchCategoryTreeType = (dispatch: any, categoryId: number) => void;
 type SetChatbotOpenType = (isOpen: boolean) => {

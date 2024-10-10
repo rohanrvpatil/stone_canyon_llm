@@ -42,9 +42,29 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
           )
         }
       >
-        <ForumSharpIcon fontSize="large" />
+        <ForumSharpIcon fontSize="large" sx={{ color: "white" }} />
       </div>
-      <div>Chatbot</div>
+      {chatbotOpen && (
+        <div className={styles.chatbotWindow}>
+          <div className={styles.chatbotHeader}>
+            <p style={{ marginLeft: "8px", fontWeight: "bold" }}>Chatbot</p>
+          </div>
+          <div className={styles.chatbotBody}>
+            {/* <ChatHistory history={messages} /> */}
+          </div>
+
+          <div className={styles.userInputContainer}>
+            <input
+              type="text"
+              placeholder="Message..."
+              className={styles.userInputField}
+            />
+            <div className={styles.userSendButton}>
+              <SendIcon fontSize="medium" />
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

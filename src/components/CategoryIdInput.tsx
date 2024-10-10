@@ -22,19 +22,27 @@ function CategoryIdInput() {
 
   return (
     <>
-      <form className={styles.form}>
-        <label style={{ color: "black" }}>Category ID:</label>
-        <input
-          className={styles.input}
-          type="text"
-          placeholder="Category ID"
-          ref={inputRef}
-        />
-        <button className={styles.button} onClick={handleButtonClick}>
-          Submit
-        </button>
-      </form>
-      <Chatbot categoryId={categoryId} />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <form className={styles.form}>
+          <label style={{ color: "black" }}>Category ID:</label>
+          <input
+            className={styles.input}
+            type="text"
+            placeholder="Category ID"
+            ref={inputRef}
+          />
+          <button className={styles.button} onClick={handleButtonClick}>
+            Submit
+          </button>
+        </form>
+        <Chatbot categoryId={categoryId} />
+      </div>
     </>
   );
 }
