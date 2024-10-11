@@ -1,9 +1,11 @@
 // general
+import axios from "axios";
 import React, { useEffect } from "react";
 import { ToastContainer } from "react-toastify";
 
 // components
 import { toggleChatbot } from "./ChatbotUtils";
+// import { createChatbotTree } from "./ChatbotTree";
 
 // styles
 import styles from "./Chatbot.module.css";
@@ -27,20 +29,29 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
   const chatbotOpen = useSelector(
     (state: RootState) => state.chatbot.chatbotOpen
   );
-
-  const fetchData = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/default");
-      const text = await response.text();
-      console.log(text);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+  // const chatbotTree = useSelector((state: RootState) => state.chatbot.tree);
 
   useEffect(() => {
-    fetchData();
-  });
+    axios
+      .get("http://localhost:5000/fetch-category-data")
+      .then((response) => {
+        const tree = response.data;
+        console.log(tree);
+        // const transformedTree: QuestionNode[] = tree.map((category) => ({
+        //   question: category.categoryName,
+        //   answer: "",
+        //   children: category.questions.map((q) => ({
+        //     question: q.question,
+        //     answer: q.answer,
+        //     children: [],
+        //   })),
+        // }));
+        // console.log(transformedTree);
+        // dispatch(setChatbotTree(transformedTree));
+      })
+      .catch((error) => console.error("Error fetching categories:", error));
+  }, [dispatch]);
+
   return (
     <>
       <ToastContainer />
