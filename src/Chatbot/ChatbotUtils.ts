@@ -1,6 +1,8 @@
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import { fetchCategoryTree } from "./ChatbotTree";
+
 // type FetchCategoryTreeType = (dispatch: any, categoryId: number) => void;
 type SetChatbotOpenType = (isOpen: boolean) => {
   type: string;
@@ -15,7 +17,7 @@ export const toggleChatbot = (
   setChatbotOpen: SetChatbotOpenType
 ) => {
   if (categoryId >= 1 && categoryId <= 7) {
-    // fetchCategoryTree(dispatch, categoryId);
+    fetchCategoryTree(dispatch, categoryId);
     dispatch(setChatbotOpen(!chatbotOpen));
   } else {
     toast.dismiss();

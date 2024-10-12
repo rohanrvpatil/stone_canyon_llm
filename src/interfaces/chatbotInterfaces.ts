@@ -1,12 +1,11 @@
-export interface QuestionNode {
-  question: string;
-  answer: string;
-  children: QuestionNode[];
-}
-
 export interface ChatbotState {
   chatbotOpen: boolean;
-  tree: QuestionNode[];
+  currentNode: ChatbotNode | null;
+}
+
+export interface ChatbotNode {
+  question: string;
+  options: { [key: string]: ChatbotNode | string };
 }
 
 export interface ChatbotProps {

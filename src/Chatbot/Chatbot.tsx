@@ -1,6 +1,5 @@
 // general
-import axios from "axios";
-import React, { useEffect } from "react";
+import React from "react";
 import { ToastContainer } from "react-toastify";
 
 // components
@@ -29,28 +28,10 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
   const chatbotOpen = useSelector(
     (state: RootState) => state.chatbot.chatbotOpen
   );
+  const currentNode = useSelector(
+    (state: RootState) => state.chatbot.currentNode
+  );
   // const chatbotTree = useSelector((state: RootState) => state.chatbot.tree);
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/fetch-category-data")
-      .then((response) => {
-        const tree = response.data;
-        console.log(tree);
-        // const transformedTree: QuestionNode[] = tree.map((category) => ({
-        //   question: category.categoryName,
-        //   answer: "",
-        //   children: category.questions.map((q) => ({
-        //     question: q.question,
-        //     answer: q.answer,
-        //     children: [],
-        //   })),
-        // }));
-        // console.log(transformedTree);
-        // dispatch(setChatbotTree(transformedTree));
-      })
-      .catch((error) => console.error("Error fetching categories:", error));
-  }, [dispatch]);
 
   return (
     <>
@@ -77,6 +58,21 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
           </div>
           <div className={styles.chatbotBody}>
             {/* <ChatHistory history={messages} /> */}
+            {currentNode && Object.keys(currentNode.options).length > 0 && (
+              <>
+                <div className={styles.questionContainer}>
+                  <p className={styles.question}>{currentNode.question}</p>
+                </div>
+
+                <div className={styles.optionsContainer}>
+                  {Object.keys(currentNode.options).map((option) => (
+                    <button key={option} className={styles.option}>
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
 
           <div className={styles.userInputContainer}>

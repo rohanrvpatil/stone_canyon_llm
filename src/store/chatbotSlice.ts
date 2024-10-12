@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // interfaces
-import { ChatbotState, QuestionNode } from "../interfaces/chatbotInterfaces";
+import { ChatbotState, ChatbotNode } from "../interfaces/chatbotInterfaces";
 
 const initialState: ChatbotState = {
+  currentNode: null,
   chatbotOpen: false,
-  tree: [],
 };
 
 const chatbotSlice = createSlice({
@@ -15,12 +15,12 @@ const chatbotSlice = createSlice({
     setChatbotOpen(state, action: PayloadAction<boolean>) {
       state.chatbotOpen = action.payload;
     },
-    setChatbotTree: (state, action: PayloadAction<QuestionNode[]>) => {
-      state.tree = action.payload;
+    setCurrentNode(state, action: PayloadAction<ChatbotNode | null>) {
+      state.currentNode = action.payload;
     },
   },
 });
 
-export const { setChatbotOpen, setChatbotTree } = chatbotSlice.actions;
+export const { setChatbotOpen, setCurrentNode } = chatbotSlice.actions;
 
 export default chatbotSlice.reducer;
