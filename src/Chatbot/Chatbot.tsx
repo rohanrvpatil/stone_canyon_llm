@@ -5,7 +5,11 @@ import Markdown from "markdown-to-jsx";
 
 // components
 import { toggleChatbot } from "./ChatbotUtils";
-import { handleOptionClick, handleUserInput } from "./ChatbotInput";
+import {
+  handleOptionClick,
+  handleUserInput,
+  handleKeyDown,
+} from "./ChatbotInput";
 import ChatHistory from "./ChatHistory";
 // import { createChatbotTree } from "./ChatbotTree";
 
@@ -121,6 +125,20 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
                 setLocalInput(e.target.value);
                 dispatch(setCurrentInput(e.target.value));
               }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  handleKeyDown(
+                    dispatch,
+                    userData,
+                    currentInput,
+                    currentInputIndex,
+                    currentNode,
+                    categoryId
+                  )(event);
+                  setLocalInput("");
+                  dispatch(setCurrentInput(""));
+                }
+              }}
             />
             <div
               className={styles.userSendButton}
@@ -130,7 +148,9 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
                   userData,
                   currentInput,
                   currentInputIndex,
-                  currentNode
+                  currentNode,
+                  categoryId,
+                  questionFunnel
                 );
                 setLocalInput("");
                 dispatch(setCurrentInput(""));

@@ -19,6 +19,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ history }) => {
                     key={`${message.id}-option-${idx}`}
                     className={styles.option}
                   >
+                    {`${idx + 1}. `}
                     {option}
                   </button>
                 ))}
@@ -27,7 +28,9 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ history }) => {
         } else if (message.type === "question") {
           return (
             <div key={message.id} className={styles.questionContainer}>
-              <Markdown className={styles.question}>{message.text}</Markdown>
+              <Markdown className={styles.question}>
+                {typeof message.text === "string" ? message.text : ""}
+              </Markdown>
             </div>
           );
         } else if (message.type === "answer") {

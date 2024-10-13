@@ -1,3 +1,6 @@
+// general
+import { KeyboardEvent } from "react";
+
 // interfaces
 import { ChatbotNode } from "../interfaces/chatbotInterfaces";
 import { UserData } from "../interfaces/userInterfaces";
@@ -20,6 +23,7 @@ import {
   validateFullAddress,
 } from "./userInputValidation";
 import { updateServiceId } from "./ChatbotAPI";
+import { fetchCategoryTree } from "./ChatbotTree";
 
 export const createChatbotNode = (question: string): ChatbotNode => ({
   question,
@@ -108,7 +112,9 @@ export const handleUserInput = async (
   userData: UserData,
   currentInput: string,
   currentInputIndex: number,
-  currentNode: ChatbotNode | null
+  currentNode: ChatbotNode | null,
+  categoryId: number,
+  questionFunnel: string
 ) => {
   // state
 
@@ -124,23 +130,60 @@ export const handleUserInput = async (
     })
   );
 
-  dispatch(
-    addMessage({
-      id: `user-${Date.now()}`,
-      text: currentInput,
-      isUser: true,
-      type: "answer",
-    })
-  );
-
   const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY!;
 
-  let botMessage = await sendMessageToChatbot(GEMINI_API_KEY, currentInput);
-  newNode = createChatbotNode(botMessage);
+  if (currentInput.toLowerCase().includes("help")) {
+    dispatch(
+      addMessage({
+        id: `user-${Date.now()}`,
+        text: currentInput,
+        isUser: true,
+        type: "answer",
+      })
+    );
 
-  dispatch(setCurrentNode(newNode));
+    let botMessage = await sendMessageToChatbot(
+      GEMINI_API_KEY,
+      currentInput +
+        "Agree to help and say that you will ask a few questions to you to know about their problem. Keep it short because" +
+        " I have automated code to handle the next part of the conversation"
+    );
+    newNode = createChatbotNode(botMessage);
+    dispatch(setCurrentNode(newNode));
 
-  return;
+    dispatch(
+      addMessage({
+        id: `question-${Date.now()}`,
+        text: botMessage,
+        isUser: false,
+        type: "question",
+      })
+    );
+
+    fetchCategoryTree(dispatch, categoryId);
+    return;
+  }
+  const numberMatch = currentInput.match(/\d+/);
+
+  if (numberMatch && currentNode) {
+    const selectedIndex = parseInt(numberMatch[0], 10) - 1;
+    const optionKeys = Object.keys(currentNode.options);
+
+    if (selectedIndex >= 0 && selectedIndex < optionKeys.length) {
+      const selectedOptionText = optionKeys[selectedIndex];
+      console.log(`Selected Option Text: ${selectedOptionText}`);
+
+      handleOptionClick(
+        dispatch,
+        currentNode,
+        selectedOptionText,
+        questionFunnel,
+        userData
+      );
+      return;
+    }
+    return;
+  }
 
   const currentQuestionKey = userDataQuestions[currentInputIndex]?.key;
 
@@ -219,4 +262,27 @@ export const handleUserInput = async (
     //   dispatch(openModal());
     // }
   }
+};
+
+export const handleKeyDown = (
+  dispatch: any,
+  userData: UserData,
+  currentInput: string,
+  currentInputIndex: number,
+  currentNode: ChatbotNode | null,
+  categoryId: number
+) => {
+  return (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleUserInput(
+        dispatch,
+        userData,
+        currentInput,
+        currentInputIndex,
+        currentNode,
+        categoryId
+      );
+    }
+  };
 };
