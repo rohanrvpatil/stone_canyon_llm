@@ -1,0 +1,22 @@
+[
+  {
+    "question": "Please enter your full name.",
+    "key": "fullName"
+  },
+  {
+    "question": "Enter your email address.",
+    "key": "emailAddress"
+  },
+  {
+    "question": "Enter your phone number.",
+    "key": "phoneNumber"
+  },
+  {
+    "question": "Enter your zip code.",
+    "key": "zipCode"
+  },
+  {
+    "question": "Enter your full address.",
+    "key": "fullAddress"
+  }
+]

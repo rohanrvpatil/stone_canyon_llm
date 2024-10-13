@@ -59,6 +59,26 @@ app.get("/fetch-category-data", async (req, res) => {
   }
 });
 
+app.post("/update-service-id", async (req, res) => {
+  const questionFunnel = req.headers["question-funnel"];
+
+  try {
+    const matchingRow = await QueryResultModel.findOne({
+      questionFunnel: questionFunnel,
+    });
+
+    if (matchingRow) {
+      const serviceId = matchingRow.serviceId;
+      res.status(200).json({ serviceId });
+    } else {
+      res.status(404).send("No matching Question Funnel found.");
+    }
+  } catch (error) {
+    console.error("Error querying MongoDB:", error);
+    res.status(500).send("Internal server error.");
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

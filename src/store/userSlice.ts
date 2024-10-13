@@ -23,12 +23,9 @@ const userSlice = createSlice({
       state.fullAddress = action.payload.fullAddress;
       state.serviceId = action.payload.serviceId;
     },
-    setServiceId(state, action: PayloadAction<{ serviceId: number }>) {
-      state.serviceId = action.payload.serviceId; // Update the serviceId in the state
-    },
   },
 });
 
-export const { setUserData, setServiceId } = userSlice.actions;
+export const { setUserData } = userSlice.actions;
 
 export default userSlice.reducer;

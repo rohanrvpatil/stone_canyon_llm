@@ -1,15 +1,25 @@
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { sendMessageToChatbot } from "./LLM";
 
-import { fetchCategoryTree } from "./ChatbotTree";
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY!;
+
+// import { fetchCategoryTree } from "./ChatbotTree";
 
 // type FetchCategoryTreeType = (dispatch: any, categoryId: number) => void;
 type SetChatbotOpenType = (isOpen: boolean) => {
   type: string;
   payload: boolean;
 };
+import { ChatbotNode } from "../interfaces";
+import { setCurrentNode } from "../store/chatbotSlice";
 
-export const toggleChatbot = (
+export const createChatbotNode = (question: string): ChatbotNode => ({
+  question,
+  options: {},
+});
+
+export const toggleChatbot = async (
   dispatch: any,
   categoryId: number,
   chatbotOpen: boolean,
@@ -17,7 +27,13 @@ export const toggleChatbot = (
   setChatbotOpen: SetChatbotOpenType
 ) => {
   if (categoryId >= 1 && categoryId <= 7) {
-    fetchCategoryTree(dispatch, categoryId);
+    // fetchCategoryTree(dispatch, categoryId);
+    const botMessage = await sendMessageToChatbot(
+      GEMINI_API_KEY,
+      "You are a chatbot. Show a welcome message"
+    );
+    const newNode = createChatbotNode(botMessage);
+    dispatch(setCurrentNode(newNode));
     dispatch(setChatbotOpen(!chatbotOpen));
   } else {
     toast.dismiss();
