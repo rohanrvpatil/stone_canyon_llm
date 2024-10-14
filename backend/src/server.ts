@@ -1,11 +1,12 @@
 // general
-import express, { NextFunction, Request, Response } from "express";
+import express from "express";
 import cors from "cors";
 import axios from "axios";
 import mongoose from "mongoose";
 
 // components
 import { connectToDatabase, checkMongoConnection } from "./database";
+import userDataQuestions from "../data/userDataQuestions.json";
 
 // setting up env variables
 import dotenv from "dotenv";
@@ -44,6 +45,21 @@ const QueryResultModel = mongoose.model<QueryResult>(
   queryResultSchema
 );
 
+app.post("/update-service-id", async (req, res) => {
+  try {
+    let questionFunnel = req.headers["Question-Funnel"];
+
+    const result = await QueryResultModel.find({
+      "Question Funnel": questionFunnel,
+    }).exec();
+
+    res.json(result);
+  } catch (error) {
+    console.error("Error querying MongoDB:", error);
+    return res.status(500).send("Internal server error.");
+  }
+});
+
 app.get("/fetch-category-data", async (req, res) => {
   try {
     const categoryId = req.query.categoryId;
@@ -59,23 +75,14 @@ app.get("/fetch-category-data", async (req, res) => {
   }
 });
 
-app.post("/update-service-id", async (req, res) => {
-  const questionFunnel = req.headers["question-funnel"];
-
-  try {
-    const matchingRow = await QueryResultModel.findOne({
-      questionFunnel: questionFunnel,
-    });
-
-    if (matchingRow) {
-      const serviceId = matchingRow.serviceId;
-      res.status(200).json({ serviceId });
-    } else {
-      res.status(404).send("No matching Question Funnel found.");
-    }
-  } catch (error) {
-    console.error("Error querying MongoDB:", error);
-    res.status(500).send("Internal server error.");
+app.get("/user-data-questions", async (req, res) => {
+  let currentQuestionIndex = 0;
+  if (currentQuestionIndex < userDataQuestions.length) {
+    res.json(userDataQuestions[currentQuestionIndex]);
+    currentQuestionIndex++;
+  } else {
+    res.json({ message: "All questions have been answered" });
+    currentQuestionIndex = 0; // Reset for next session or set appropriate handling
   }
 });
 

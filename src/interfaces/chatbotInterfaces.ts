@@ -5,6 +5,7 @@ export interface ChatbotState {
   messages: ChatMessage[];
   currentInput: string;
   currentInputIndex: number;
+  chatbotTree: ChatbotNode | null;
 }
 
 export interface ChatbotNode {

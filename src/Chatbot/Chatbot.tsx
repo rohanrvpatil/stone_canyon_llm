@@ -133,7 +133,8 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
                     currentInput,
                     currentInputIndex,
                     currentNode,
-                    categoryId
+                    categoryId,
+                    questionFunnel
                   )(event);
                   setLocalInput("");
                   dispatch(setCurrentInput(""));

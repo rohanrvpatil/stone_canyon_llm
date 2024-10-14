@@ -10,6 +10,7 @@ import {
   addMessage,
   setCurrentNode,
   setQuestionFunnel,
+  setCurrentInputIndex,
 } from "../store/chatbotSlice";
 import { setUserData } from "../store/userSlice";
 
@@ -22,7 +23,7 @@ import {
   validateZipCode,
   validateFullAddress,
 } from "./userInputValidation";
-import { updateServiceId } from "./ChatbotAPI";
+import { updateServiceId, fetchUserDataQuestions } from "./ChatbotAPI";
 import { fetchCategoryTree } from "./ChatbotTree";
 
 export const createChatbotNode = (question: string): ChatbotNode => ({
@@ -71,27 +72,20 @@ export const handleOptionClick = async (
 
     let newQuestionFunnel = currentNode.question + " > " + option;
 
-    if (
+    const isNextNodeInvalid =
       !nextNode ||
       !nextNode.options ||
-      Object.keys(nextNode.options).length === 0
-    ) {
-      // fetchUserDataQuestions(dispatch);
-    } else {
-      newQuestionFunnel += " | ";
-    }
-    dispatch(setQuestionFunnel(questionFunnel + newQuestionFunnel));
+      Object.keys(nextNode.options).length === 0;
 
-    if (
-      !nextNode ||
-      !nextNode.options ||
-      Object.keys(nextNode.options).length === 0
-    ) {
+    if (isNextNodeInvalid) {
+      fetchUserDataQuestions(dispatch);
       console.log(questionFunnel + newQuestionFunnel);
+
       const response = await updateServiceId(
         questionFunnel + newQuestionFunnel
       );
       const { serviceId } = response;
+      console.log(serviceId);
 
       const updatedUserData: UserData = {
         ...userData,
@@ -99,12 +93,17 @@ export const handleOptionClick = async (
       };
 
       dispatch(setUserData(updatedUserData));
+    } else {
+      newQuestionFunnel += " | ";
     }
 
-    // console.log("Updated Question Funnel:", questionFunnel + newQuestionFunnel);
+    dispatch(setQuestionFunnel(questionFunnel + newQuestionFunnel));
+
+    console.log("Updated Question Funnel:", questionFunnel + newQuestionFunnel);
   }
 };
 
+import { openModal } from "../store/modalSlice";
 import { sendMessageToChatbot } from "./LLM";
 
 export const handleUserInput = async (
@@ -121,18 +120,18 @@ export const handleUserInput = async (
   let newNode = createChatbotNode("Typing...");
   dispatch(setCurrentNode(newNode));
 
-  dispatch(
-    addMessage({
-      id: `question-${Date.now()}`,
-      text: currentNode!.question,
-      isUser: false,
-      type: "question",
-    })
-  );
-
   const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY!;
 
   if (currentInput.toLowerCase().includes("help")) {
+    dispatch(
+      addMessage({
+        id: `question-${Date.now()}`,
+        text: currentNode!.question,
+        isUser: false,
+        type: "question",
+      })
+    );
+
     dispatch(
       addMessage({
         id: `user-${Date.now()}`,
@@ -249,18 +248,18 @@ export const handleUserInput = async (
 
     dispatch(setUserData(updatedUserData));
 
-    // if (currentInputIndex < userDataQuestions.length - 1) {
-    //   const newIndex = currentInputIndex + 1;
-    //   dispatch(setCurrentInputIndex(newIndex));
-    //   const nextNode = createChatbotNode(
-    //     userDataQuestions[currentInputIndex + 1].question
-    //   );
-    //   dispatch(setCurrentNode(nextNode));
-    // } else {
-    //   console.log(userData);
-    //   dispatch(setCurrentNode(null));
-    //   dispatch(openModal());
-    // }
+    if (currentInputIndex < userDataQuestions.length - 1) {
+      const newIndex = currentInputIndex + 1;
+      dispatch(setCurrentInputIndex(newIndex));
+      const nextNode = createChatbotNode(
+        userDataQuestions[currentInputIndex + 1].question
+      );
+      dispatch(setCurrentNode(nextNode));
+    } else {
+      console.log(userData);
+      dispatch(setCurrentNode(null));
+      dispatch(openModal());
+    }
   }
 };
 
@@ -270,7 +269,8 @@ export const handleKeyDown = (
   currentInput: string,
   currentInputIndex: number,
   currentNode: ChatbotNode | null,
-  categoryId: number
+  categoryId: number,
+  questionFunnel: string
 ) => {
   return (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
@@ -281,7 +281,8 @@ export const handleKeyDown = (
         currentInput,
         currentInputIndex,
         currentNode,
-        categoryId
+        categoryId,
+        questionFunnel
       );
     }
   };

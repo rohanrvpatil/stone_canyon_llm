@@ -14,6 +14,7 @@ const initialState: ChatbotState = {
   messages: [],
   currentInput: "",
   currentInputIndex: 0,
+  chatbotTree: null,
 };
 
 const chatbotSlice = createSlice({
@@ -35,6 +36,12 @@ const chatbotSlice = createSlice({
     setCurrentInput: (state, action: PayloadAction<string>) => {
       state.currentInput = action.payload;
     },
+    setChatbotTree(state, action: PayloadAction<ChatbotNode | null>) {
+      state.chatbotTree = action.payload;
+    },
+    setCurrentInputIndex(state, action: PayloadAction<number>) {
+      state.currentInputIndex = action.payload;
+    },
   },
 });
 
@@ -44,6 +51,8 @@ export const {
   setQuestionFunnel,
   addMessage,
   setCurrentInput,
+  setChatbotTree,
+  setCurrentInputIndex,
 } = chatbotSlice.actions;
 
 export default chatbotSlice.reducer;
