@@ -47,9 +47,10 @@ const QueryResultModel = mongoose.model<QueryResult>(
 
 app.post("/update-service-id", async (req, res) => {
   try {
-    let questionFunnel = req.headers["Question-Funnel"];
+    const questionFunnel = req.headers["question-funnel"];
 
-    const result = await QueryResultModel.find({
+    // console.log(`Question Funnel: ${questionFunnel}`);
+    const result = await QueryResultModel.findOne({
       "Question Funnel": questionFunnel,
     }).exec();
 
@@ -63,11 +64,13 @@ app.post("/update-service-id", async (req, res) => {
 app.get("/fetch-category-data", async (req, res) => {
   try {
     const categoryId = req.query.categoryId;
-    // console.log(categoryId);
+    // console.log(`Category ID: ${categoryId}`);
 
     const result = await QueryResultModel.find({
       "Category ID": Number(categoryId),
     }).exec();
+
+    console.log(`Matched result: ${result}`);
 
     res.json(result);
   } catch (error) {

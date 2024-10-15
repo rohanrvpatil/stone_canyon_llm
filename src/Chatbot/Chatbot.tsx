@@ -1,5 +1,5 @@
 // general
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ToastContainer } from "react-toastify";
 import Markdown from "markdown-to-jsx";
 
@@ -11,6 +11,8 @@ import {
   handleKeyDown,
 } from "./ChatbotInput";
 import ChatHistory from "./ChatHistory";
+import UserDataModal from "./UserDataModal";
+
 // import { createChatbotTree } from "./ChatbotTree";
 
 // styles
@@ -20,6 +22,7 @@ import styles from "./Chatbot.module.css";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store";
 import { setChatbotOpen, setCurrentInput } from "../store/chatbotSlice";
+import { closeModal } from "../store/modalSlice";
 
 // icons
 import ForumSharpIcon from "@mui/icons-material/ForumSharp";
@@ -49,10 +52,19 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
   const currentInputIndex = useSelector(
     (state: RootState) => state.chatbot.currentInputIndex
   );
+  const isOpen = useSelector((state: any) => state.modal.isOpen);
+  const serviceId = useSelector((state: RootState) => state.user.serviceId);
+
   const [localInput, setLocalInput] = useState(currentInput);
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
   // const chatbotTree = useSelector((state: RootState) => state.chatbot.tree);
-
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
   return (
     <>
       <ToastContainer />
@@ -73,10 +85,25 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
       </div>
       {chatbotOpen && (
         <div className={styles.chatbotWindow}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            {isOpen ? (
+              <UserDataModal
+                dispatch={dispatch}
+                isOpen={isOpen}
+                userData={userData}
+                onClose={closeModal}
+              />
+            ) : null}
+          </div>
           <div className={styles.chatbotHeader}>
             <p style={{ marginLeft: "8px", fontWeight: "bold" }}>Chatbot</p>
           </div>
-          <div className={styles.chatbotBody}>
+          <div className={styles.chatbotBody} ref={chatContainerRef}>
             <ChatHistory history={messages} />
             {currentNode && Object.keys(currentNode.options).length > 0 && (
               <>
@@ -134,7 +161,8 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
                     currentInputIndex,
                     currentNode,
                     categoryId,
-                    questionFunnel
+                    questionFunnel,
+                    serviceId
                   )(event);
                   setLocalInput("");
                   dispatch(setCurrentInput(""));
@@ -151,7 +179,8 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
                   currentInputIndex,
                   currentNode,
                   categoryId,
-                  questionFunnel
+                  questionFunnel,
+                  serviceId
                 );
                 setLocalInput("");
                 dispatch(setCurrentInput(""));

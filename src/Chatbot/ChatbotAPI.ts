@@ -20,8 +20,10 @@ export const updateServiceId = async (questionFunnel: string) => {
     if (!response.ok) {
       throw new Error(`Error: ${response.statusText}`);
     }
-
-    return await response.json();
+    const data = await response.json();
+    const serviceId = data["Service ID"]; // Destructure serviceId from the response
+    console.log(`Service ID in Chatbot API: ${serviceId}`);
+    return serviceId; // Return the service ID
   } catch (error) {
     console.error("Failed to update service ID:", error);
     return null;

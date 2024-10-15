@@ -72,20 +72,27 @@ export const handleOptionClick = async (
 
     let newQuestionFunnel = currentNode.question + " > " + option;
 
-    const isNextNodeInvalid =
+    if (
       !nextNode ||
       !nextNode.options ||
-      Object.keys(nextNode.options).length === 0;
-
-    if (isNextNodeInvalid) {
+      Object.keys(nextNode.options).length === 0
+    ) {
       fetchUserDataQuestions(dispatch);
-      console.log(questionFunnel + newQuestionFunnel);
+    } else {
+      newQuestionFunnel += " | ";
+    }
+    dispatch(setQuestionFunnel(questionFunnel + newQuestionFunnel));
 
-      const response = await updateServiceId(
+    if (
+      !nextNode ||
+      !nextNode.options ||
+      Object.keys(nextNode.options).length === 0
+    ) {
+      console.log(questionFunnel + newQuestionFunnel);
+      const serviceId = await updateServiceId(
         questionFunnel + newQuestionFunnel
       );
-      const { serviceId } = response;
-      console.log(serviceId);
+      console.log(`Service ID: ${serviceId}`);
 
       const updatedUserData: UserData = {
         ...userData,
@@ -93,13 +100,9 @@ export const handleOptionClick = async (
       };
 
       dispatch(setUserData(updatedUserData));
-    } else {
-      newQuestionFunnel += " | ";
     }
 
-    dispatch(setQuestionFunnel(questionFunnel + newQuestionFunnel));
-
-    console.log("Updated Question Funnel:", questionFunnel + newQuestionFunnel);
+    // console.log("Updated Question Funnel:", questionFunnel + newQuestionFunnel);
   }
 };
 
@@ -113,80 +116,13 @@ export const handleUserInput = async (
   currentInputIndex: number,
   currentNode: ChatbotNode | null,
   categoryId: number,
-  questionFunnel: string
+  questionFunnel: string,
+  serviceId: number
 ) => {
   // state
 
-  let newNode = createChatbotNode("Typing...");
-  dispatch(setCurrentNode(newNode));
-
-  const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY!;
-
-  if (currentInput.toLowerCase().includes("help")) {
-    dispatch(
-      addMessage({
-        id: `question-${Date.now()}`,
-        text: currentNode!.question,
-        isUser: false,
-        type: "question",
-      })
-    );
-
-    dispatch(
-      addMessage({
-        id: `user-${Date.now()}`,
-        text: currentInput,
-        isUser: true,
-        type: "answer",
-      })
-    );
-
-    let botMessage = await sendMessageToChatbot(
-      GEMINI_API_KEY,
-      currentInput +
-        "Agree to help and say that you will ask a few questions to you to know about their problem. Keep it short because" +
-        " I have automated code to handle the next part of the conversation"
-    );
-    newNode = createChatbotNode(botMessage);
-    dispatch(setCurrentNode(newNode));
-
-    dispatch(
-      addMessage({
-        id: `question-${Date.now()}`,
-        text: botMessage,
-        isUser: false,
-        type: "question",
-      })
-    );
-
-    fetchCategoryTree(dispatch, categoryId);
-    return;
-  }
-  const numberMatch = currentInput.match(/\d+/);
-
-  if (numberMatch && currentNode) {
-    const selectedIndex = parseInt(numberMatch[0], 10) - 1;
-    const optionKeys = Object.keys(currentNode.options);
-
-    if (selectedIndex >= 0 && selectedIndex < optionKeys.length) {
-      const selectedOptionText = optionKeys[selectedIndex];
-      console.log(`Selected Option Text: ${selectedOptionText}`);
-
-      handleOptionClick(
-        dispatch,
-        currentNode,
-        selectedOptionText,
-        questionFunnel,
-        userData
-      );
-      return;
-    }
-    return;
-  }
-
   const currentQuestionKey = userDataQuestions[currentInputIndex]?.key;
-
-  if (currentNode) {
+  if (currentNode && serviceId) {
     let errorMessage: string | null = null;
     // Validate input based on the current question
 
@@ -240,26 +176,93 @@ export const handleUserInput = async (
 
       return;
     }
+  }
 
-    const updatedUserData: UserData = {
-      ...userData,
-      [currentQuestionKey]: currentInput,
-    };
+  let newNode = createChatbotNode("Preparing response...");
+  dispatch(setCurrentNode(newNode));
 
-    dispatch(setUserData(updatedUserData));
+  const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY!;
 
-    if (currentInputIndex < userDataQuestions.length - 1) {
-      const newIndex = currentInputIndex + 1;
-      dispatch(setCurrentInputIndex(newIndex));
-      const nextNode = createChatbotNode(
-        userDataQuestions[currentInputIndex + 1].question
+  if (currentInput.toLowerCase().includes("help")) {
+    dispatch(
+      addMessage({
+        id: `question-${Date.now()}`,
+        text: currentNode!.question,
+        isUser: false,
+        type: "question",
+      })
+    );
+
+    dispatch(
+      addMessage({
+        id: `user-${Date.now()}`,
+        text: currentInput,
+        isUser: true,
+        type: "answer",
+      })
+    );
+
+    let botMessage = await sendMessageToChatbot(
+      GEMINI_API_KEY,
+      currentInput +
+        "Agree to help and say that you will ask a few questions to you to know about their problem. Keep it short because" +
+        " I have automated code to handle the next part of the conversation"
+    );
+    newNode = createChatbotNode(botMessage);
+    dispatch(setCurrentNode(newNode));
+
+    dispatch(
+      addMessage({
+        id: `question-${Date.now()}`,
+        text: botMessage,
+        isUser: false,
+        type: "question",
+      })
+    );
+
+    fetchCategoryTree(dispatch, categoryId);
+    return;
+  }
+
+  const digitMatch = currentInput.replace(/\D/g, "");
+
+  if (digitMatch.length === 1 && currentNode) {
+    const selectedIndex = parseInt(digitMatch, 10) - 1;
+    const optionKeys = Object.keys(currentNode.options);
+
+    if (selectedIndex >= 0 && selectedIndex < optionKeys.length) {
+      const selectedOptionText = optionKeys[selectedIndex];
+      console.log(`Selected Option Text: ${selectedOptionText}`);
+
+      handleOptionClick(
+        dispatch,
+        currentNode,
+        selectedOptionText,
+        questionFunnel,
+        userData
       );
-      dispatch(setCurrentNode(nextNode));
-    } else {
-      console.log(userData);
-      dispatch(setCurrentNode(null));
-      dispatch(openModal());
+      return;
     }
+  }
+
+  const updatedUserData: UserData = {
+    ...userData,
+    [currentQuestionKey]: currentInput,
+  };
+
+  dispatch(setUserData(updatedUserData));
+
+  if (currentInputIndex < userDataQuestions.length - 1) {
+    const newIndex = currentInputIndex + 1;
+    dispatch(setCurrentInputIndex(newIndex));
+    const nextNode = createChatbotNode(
+      userDataQuestions[currentInputIndex + 1].question
+    );
+    dispatch(setCurrentNode(nextNode));
+  } else {
+    console.log(userData);
+    dispatch(setCurrentNode(null));
+    dispatch(openModal());
   }
 };
 
@@ -270,7 +273,8 @@ export const handleKeyDown = (
   currentInputIndex: number,
   currentNode: ChatbotNode | null,
   categoryId: number,
-  questionFunnel: string
+  questionFunnel: string,
+  serviceId: number
 ) => {
   return (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
@@ -282,7 +286,8 @@ export const handleKeyDown = (
         currentInputIndex,
         currentNode,
         categoryId,
-        questionFunnel
+        questionFunnel,
+        serviceId
       );
     }
   };
