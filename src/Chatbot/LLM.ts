@@ -30,7 +30,7 @@ export const sendMessageToChatbot = async (
     }
 
     const data = await response.json();
-    console.log(data);
+    // console.log(data);
     const botResponse = data?.candidates?.[0]?.content?.parts?.[0]?.text; //this line contains the response
     return botResponse;
   } catch (error) {

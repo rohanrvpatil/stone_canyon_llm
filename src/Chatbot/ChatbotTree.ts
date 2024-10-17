@@ -41,9 +41,9 @@ export const fetchCategoryTree = (dispatch: any, categoryId: number) => {
     .get(`http://localhost:5000/fetch-category-data?categoryId=${categoryId}`)
     .then((response) => {
       const categoryData = response.data;
-      console.log(categoryData);
+      // console.log(categoryData);
       const chatbotTree = buildChatbotTreeFromArray(categoryData, categoryId);
-      console.log(chatbotTree);
+      // console.log(chatbotTree);
       dispatch(setCurrentNode(chatbotTree));
     })
     .catch((error) => console.error("Error fetching categories:", error));

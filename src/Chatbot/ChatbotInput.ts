@@ -164,7 +164,7 @@ export const handleUserInput = async (
       const closestMatch = await sendMessageToChatbot(GEMINI_API_KEY, prompt);
       const cleanedClosestMatch = closestMatch?.replace(/\s+/g, "") ?? "";
 
-      console.log(`Cleaned Closest Match: ${cleanedClosestMatch}`);
+      // console.log(`Cleaned Closest Match: ${cleanedClosestMatch}`);
       if (cleanedClosestMatch != "Nomatch") {
         const matchedOption = optionKeys.find(
           (option) =>
@@ -172,9 +172,9 @@ export const handleUserInput = async (
             cleanedClosestMatch.toLowerCase()
         );
 
-        console.log(`Matched option: ${matchedOption}`);
+        // console.log(`Matched option: ${matchedOption}`);
         if (matchedOption) {
-          console.log(`Matched Option Text: ${matchedOption}`);
+          // console.log(`Matched Option Text: ${matchedOption}`);
 
           handleOptionClick(
             dispatch,
@@ -186,6 +186,24 @@ export const handleUserInput = async (
           return;
         }
       } else {
+        dispatch(
+          addMessage({
+            id: `question-${Date.now()}`,
+            text: currentNode!.question,
+            isUser: false,
+            type: "question",
+          })
+        );
+
+        dispatch(
+          addMessage({
+            id: `options-${Date.now()}`,
+            text: Object.keys(currentNode.options),
+            isUser: false,
+            type: "options",
+          })
+        );
+
         dispatch(
           addMessage({
             id: `error-${Date.now()}`,
