@@ -1,5 +1,5 @@
 // general
-import { KeyboardEvent } from "react";
+// import { KeyboardEvent } from "react";
 
 // interfaces
 import { ChatbotNode } from "../interfaces/chatbotInterfaces";
@@ -10,22 +10,17 @@ import {
   addMessage,
   setCurrentNode,
   setQuestionFunnel,
-  setCurrentInputIndex,
 } from "../store/chatbotSlice";
 import { setUserData } from "../store/userSlice";
 
 // components
 import userDataQuestions from "../../backend/data/userDataQuestions.json";
-import {
-  validateFullName,
-  validateEmail,
-  validatePhone,
-  validateZipCode,
-  validateFullAddress,
-} from "./userInputValidation";
-import { updateServiceId, fetchUserDataQuestions } from "./ChatbotAPI";
-import { fetchCategoryTree } from "./ChatbotTree";
+import handleUserInputValidation from "./handleUserInputValidation";
+import handleWordHelp from "./handleWordHelp";
 
+import { updateServiceId, fetchUserDataQuestions } from "./ChatbotAPI";
+
+// helper functions
 export const createChatbotNode = (question: string): ChatbotNode => ({
   question,
   options: {},
@@ -78,21 +73,9 @@ export const handleOptionClick = async (
       Object.keys(nextNode.options).length === 0
     ) {
       fetchUserDataQuestions(dispatch);
-    } else {
-      newQuestionFunnel += " | ";
-    }
-    dispatch(setQuestionFunnel(questionFunnel + newQuestionFunnel));
-
-    if (
-      !nextNode ||
-      !nextNode.options ||
-      Object.keys(nextNode.options).length === 0
-    ) {
-      console.log(questionFunnel + newQuestionFunnel);
       const serviceId = await updateServiceId(
         questionFunnel + newQuestionFunnel
       );
-      console.log(`Service ID: ${serviceId}`);
 
       const updatedUserData: UserData = {
         ...userData,
@@ -100,14 +83,12 @@ export const handleOptionClick = async (
       };
 
       dispatch(setUserData(updatedUserData));
+    } else {
+      newQuestionFunnel += " | ";
     }
-
-    // console.log("Updated Question Funnel:", questionFunnel + newQuestionFunnel);
+    dispatch(setQuestionFunnel(questionFunnel + newQuestionFunnel));
   }
 };
-
-import { openModal } from "../store/modalSlice";
-import { sendMessageToChatbot } from "./LLM";
 
 export const handleUserInput = async (
   dispatch: any,
@@ -119,109 +100,30 @@ export const handleUserInput = async (
   questionFunnel: string,
   serviceId: number
 ) => {
-  // state
+  const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY!;
 
   const currentQuestionKey = userDataQuestions[currentInputIndex]?.key;
   if (currentNode && serviceId) {
-    let errorMessage: string | null = null;
-    // Validate input based on the current question
-
-    switch (currentQuestionKey) {
-      case "fullName":
-        errorMessage = validateFullName(currentInput);
-        break;
-      case "emailAddress":
-        errorMessage = validateEmail(currentInput);
-        break;
-      case "phoneNumber":
-        errorMessage = validatePhone(currentInput);
-        break;
-      case "zipCode":
-        errorMessage = validateZipCode(currentInput);
-        break;
-      case "fullAddress":
-        errorMessage = validateFullAddress(currentInput);
-        break;
-      default:
-        break;
-    }
-
-    dispatch(
-      addMessage({
-        id: `question-${Date.now()}`,
-        text: currentNode.question,
-        isUser: false,
-        type: "question",
-      })
+    handleUserInputValidation(
+      dispatch,
+      currentInput,
+      currentNode,
+      currentQuestionKey,
+      currentInputIndex
     );
-
-    dispatch(
-      addMessage({
-        id: `user-${Date.now()}`,
-        text: currentInput,
-        isUser: true,
-        type: "answer",
-      })
-    );
-
-    if (errorMessage) {
-      dispatch(
-        addMessage({
-          id: `error-${Date.now()}`,
-          text: errorMessage,
-          isUser: false,
-          type: "error",
-        })
-      );
-
-      return;
-    }
   }
 
-  let newNode = createChatbotNode("Preparing response...");
-  dispatch(setCurrentNode(newNode));
-
-  const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY!;
-
   if (currentInput.toLowerCase().includes("help")) {
-    dispatch(
-      addMessage({
-        id: `question-${Date.now()}`,
-        text: currentNode!.question,
-        isUser: false,
-        type: "question",
-      })
-    );
-
-    dispatch(
-      addMessage({
-        id: `user-${Date.now()}`,
-        text: currentInput,
-        isUser: true,
-        type: "answer",
-      })
-    );
-
-    let botMessage = await sendMessageToChatbot(
-      GEMINI_API_KEY,
-      currentInput +
-        "Agree to help and say that you will ask a few questions to you to know about their problem. Keep it short because" +
-        " I have automated code to handle the next part of the conversation"
-    );
-    newNode = createChatbotNode(botMessage);
+    let newNode = createChatbotNode("Preparing response...");
     dispatch(setCurrentNode(newNode));
 
-    dispatch(
-      addMessage({
-        id: `question-${Date.now()}`,
-        text: botMessage,
-        isUser: false,
-        type: "question",
-      })
-    );
-
-    fetchCategoryTree(dispatch, categoryId);
-    return;
+    await handleWordHelp({
+      dispatch,
+      currentInput,
+      currentNode,
+      categoryId,
+      GEMINI_API_KEY,
+    });
   }
 
   const digitMatch = currentInput.replace(/\D/g, "");
@@ -251,19 +153,6 @@ export const handleUserInput = async (
   };
 
   dispatch(setUserData(updatedUserData));
-
-  if (currentInputIndex < userDataQuestions.length - 1) {
-    const newIndex = currentInputIndex + 1;
-    dispatch(setCurrentInputIndex(newIndex));
-    const nextNode = createChatbotNode(
-      userDataQuestions[currentInputIndex + 1].question
-    );
-    dispatch(setCurrentNode(nextNode));
-  } else {
-    console.log(userData);
-    dispatch(setCurrentNode(null));
-    dispatch(openModal());
-  }
 };
 
 export const handleKeyDown = (
@@ -276,19 +165,16 @@ export const handleKeyDown = (
   questionFunnel: string,
   serviceId: number
 ) => {
-  return (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      handleUserInput(
-        dispatch,
-        userData,
-        currentInput,
-        currentInputIndex,
-        currentNode,
-        categoryId,
-        questionFunnel,
-        serviceId
-      );
-    }
-  };
+  if (currentInput.trim() !== "") {
+    handleUserInput(
+      dispatch,
+      userData,
+      currentInput,
+      currentInputIndex,
+      currentNode,
+      categoryId,
+      questionFunnel,
+      serviceId
+    );
+  }
 };

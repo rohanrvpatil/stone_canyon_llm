@@ -1,4 +1,5 @@
 import React from "react";
+import { memo } from "react";
 
 import styles from "../Chatbot/Chatbot.module.css";
 import Markdown from "markdown-to-jsx";
@@ -50,4 +51,4 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ history }) => {
     </div>
   );
 };
-export default ChatHistory;
+export default memo(ChatHistory);
