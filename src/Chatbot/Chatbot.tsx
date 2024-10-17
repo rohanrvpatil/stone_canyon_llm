@@ -22,9 +22,8 @@ import { closeModal } from "../store/modalSlice";
 // interfaces
 import { ChatbotProps } from "../interfaces/chatbotInterfaces";
 import ChatbotHeader from "./ChatbotHeader";
-import ChatbotBody from "./ChatbotBody";
 import ChatbotIcon from "./ChatbotIcon";
-import ChatHistory from "./ChatHistory";
+import ChatbotBody from "./ChatbotBody";
 
 const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
   // state
@@ -81,7 +80,6 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
             ) : null}
           </div>
           <ChatbotHeader />
-          <ChatHistory history={messages} />
           <ChatbotBody
             dispatch={dispatch}
             memoizedCurrentNode={memoizedCurrentNode}
