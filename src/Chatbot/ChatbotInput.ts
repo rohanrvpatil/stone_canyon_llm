@@ -19,6 +19,7 @@ import handleUserInputValidation from "./handleUserInputValidation";
 import handleWordHelp from "./handleWordHelp";
 
 import { updateServiceId, fetchUserDataQuestions } from "./ChatbotAPI";
+import { sendMessageToChatbot } from "./LLM";
 
 // helper functions
 export const createChatbotNode = (question: string): ChatbotNode => ({
@@ -102,6 +103,7 @@ export const handleUserInput = async (
 ) => {
   const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY!;
 
+  // when user has already answered all questions in the question funnel
   const currentQuestionKey = userDataQuestions[currentInputIndex]?.key;
   if (currentNode && serviceId) {
     handleUserInputValidation(
@@ -112,7 +114,7 @@ export const handleUserInput = async (
       currentInputIndex
     );
   }
-
+  // when user enters anything which includes "help"
   if (currentInput.toLowerCase().includes("help")) {
     let newNode = createChatbotNode("Preparing response...");
     dispatch(setCurrentNode(newNode));
@@ -126,6 +128,7 @@ export const handleUserInput = async (
     });
   }
 
+  // when user enters option number
   const digitMatch = currentInput.replace(/\D/g, "");
 
   if (digitMatch.length === 1 && currentNode) {
@@ -144,6 +147,58 @@ export const handleUserInput = async (
         userData
       );
       return;
+    }
+  }
+
+  // when user enters option text
+  if (currentNode && Object.keys(currentNode.options).length > 0) {
+    const optionKeys = Object.keys(currentNode.options);
+
+    const prompt = `Given the options: "${optionKeys.join(
+      '", "'
+    )}", what is the closest match to this input: "${currentInput}"?.
+    If you think there's a match return the option text which matches the user input.
+    If you think there's no close match, then just return "No match"`;
+
+    try {
+      const closestMatch = await sendMessageToChatbot(GEMINI_API_KEY, prompt);
+      const cleanedClosestMatch = closestMatch?.replace(/\s+/g, "") ?? "";
+
+      console.log(`Cleaned Closest Match: ${cleanedClosestMatch}`);
+      if (cleanedClosestMatch != "Nomatch") {
+        const matchedOption = optionKeys.find(
+          (option) =>
+            option.replace(/\s+/g, "").toLowerCase() ===
+            cleanedClosestMatch.toLowerCase()
+        );
+
+        console.log(`Matched option: ${matchedOption}`);
+        if (matchedOption) {
+          console.log(`Matched Option Text: ${matchedOption}`);
+
+          handleOptionClick(
+            dispatch,
+            currentNode,
+            matchedOption,
+            questionFunnel,
+            userData
+          );
+          return;
+        }
+      } else {
+        dispatch(
+          addMessage({
+            id: `error-${Date.now()}`,
+            text: "No option is closely matching your input. Please try again",
+            isUser: false,
+            type: "error",
+          })
+        );
+
+        // return;
+      }
+    } catch (error) {
+      console.error("Error finding the closest match:", error);
     }
   }
 
