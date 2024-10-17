@@ -10,14 +10,15 @@ import { ChatHistoryProps } from "../interfaces";
 const ChatHistory: React.FC<ChatHistoryProps> = ({ history }) => {
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
-      {history.map((message) => {
+      {history.map((message, index) => {
+        const uniqueKey = message.id || index;
         if (message.type === "options") {
           return (
             <div key={message.id} className={styles.optionsContainer}>
               {Array.isArray(message.text) && // Check if text is an array
                 message.text.map((option, idx) => (
                   <button
-                    key={`${message.id}-option-${idx}`}
+                    key={`${message.id}-option-${option}-${idx}`}
                     className={styles.option}
                   >
                     {`${idx + 1}. `}
@@ -28,7 +29,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ history }) => {
           );
         } else if (message.type === "question") {
           return (
-            <div key={message.id} className={styles.questionContainer}>
+            <div key={uniqueKey} className={styles.questionContainer}>
               <Markdown className={styles.question}>
                 {typeof message.text === "string" ? message.text : ""}
               </Markdown>
@@ -36,13 +37,13 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ history }) => {
           );
         } else if (message.type === "answer") {
           return (
-            <div key={message.id} className={styles.answerContainer}>
+            <div key={uniqueKey} className={styles.answerContainer}>
               <p className={styles.answer}>{message.text}</p>
             </div>
           );
         } else {
           return (
-            <div key={message.id} className={styles.validationErrorContainer}>
+            <div key={uniqueKey} className={styles.validationErrorContainer}>
               <p className={styles.validationError}>{message.text}</p>
             </div>
           );

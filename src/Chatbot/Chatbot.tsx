@@ -1,12 +1,11 @@
 // general
 import React, { useEffect, useRef } from "react";
 import { ToastContainer } from "react-toastify";
-import Markdown from "markdown-to-jsx";
+import { useMemo } from "react";
 
 // components
 import { toggleChatbot } from "./ChatbotUtils";
 import { handleOptionClick } from "./ChatbotInput";
-import ChatHistory from "./ChatHistory";
 import UserDataModal from "./UserDataModal";
 import UserInputField from "./UserInputField";
 // import { createChatbotTree } from "./ChatbotTree";
@@ -20,11 +19,12 @@ import { RootState } from "../store";
 import { setChatbotOpen } from "../store/chatbotSlice";
 import { closeModal } from "../store/modalSlice";
 
-// icons
-import ForumSharpIcon from "@mui/icons-material/ForumSharp";
-
 // interfaces
 import { ChatbotProps } from "../interfaces/chatbotInterfaces";
+import ChatbotHeader from "./ChatbotHeader";
+import ChatbotBody from "./ChatbotBody";
+import ChatbotIcon from "./ChatbotIcon";
+import ChatHistory from "./ChatHistory";
 
 const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
   // state
@@ -44,6 +44,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
   const isOpen = useSelector((state: any) => state.modal.isOpen);
 
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
+  const memoizedCurrentNode = useMemo(() => currentNode, [currentNode]);
 
   // const chatbotTree = useSelector((state: RootState) => state.chatbot.tree);
   useEffect(() => {
@@ -54,22 +55,14 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
   }, [messages]);
   return (
     <>
-      <ToastContainer />
-      {/*  Pops up if invalid categoryId is entered*/}
-      <div
-        className={styles.chatbotIcon}
-        onClick={() =>
-          toggleChatbot(
-            dispatch,
-            categoryId,
-            chatbotOpen,
-            // fetchCategoryTree,
-            setChatbotOpen
-          )
-        }
-      >
-        <ForumSharpIcon fontSize="large" sx={{ color: "white" }} />
-      </div>
+      <ToastContainer /> {/*  Pops up if invalid categoryId is entered*/}
+      <ChatbotIcon
+        toggleChatbot={toggleChatbot}
+        dispatch={dispatch}
+        categoryId={categoryId}
+        chatbotOpen={chatbotOpen}
+        setChatbotOpen={setChatbotOpen}
+      />
       {chatbotOpen && (
         <div className={styles.chatbotWindow}>
           <div
@@ -87,47 +80,15 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
               />
             ) : null}
           </div>
-          <div className={styles.chatbotHeader}>
-            <p style={{ marginLeft: "8px", fontWeight: "bold" }}>Chatbot</p>
-          </div>
-          <div className={styles.chatbotBody} ref={chatContainerRef}>
-            <ChatHistory history={messages} />
-            {currentNode && Object.keys(currentNode.options).length > 0 && (
-              <>
-                <div className={styles.questionContainer}>
-                  <p className={styles.question}>{currentNode.question}</p>
-                </div>
-
-                <div className={styles.optionsContainer}>
-                  {Object.keys(currentNode.options).map((option, index) => (
-                    <button
-                      key={option}
-                      onClick={() =>
-                        handleOptionClick(
-                          dispatch,
-                          currentNode,
-                          option,
-                          questionFunnel,
-                          userData
-                        )
-                      }
-                      className={styles.option}
-                    >
-                      {`${index + 1}. `}
-                      {option}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-            {currentNode && Object.keys(currentNode.options).length === 0 && (
-              <div className={styles.questionContainer}>
-                <Markdown className={styles.question}>
-                  {currentNode.question}
-                </Markdown>
-              </div>
-            )}
-          </div>
+          <ChatbotHeader />
+          <ChatHistory history={messages} />
+          <ChatbotBody
+            dispatch={dispatch}
+            memoizedCurrentNode={memoizedCurrentNode}
+            handleOptionClick={handleOptionClick}
+            questionFunnel={questionFunnel}
+            userData={userData}
+          />
 
           <UserInputField categoryId={categoryId} />
         </div>
