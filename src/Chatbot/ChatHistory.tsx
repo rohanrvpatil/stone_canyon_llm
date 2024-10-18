@@ -1,13 +1,14 @@
 import React from "react";
-import { memo } from "react";
+// import { memo } from "react";
 
-import styles from "../Chatbot/Chatbot.module.css";
+import styles from "./Chatbot.module.css";
 import Markdown from "markdown-to-jsx";
+import ScaleMessage from "./ScaleMessage";
 
 // interfaces
 import { ChatHistoryProps } from "../interfaces";
 
-const ChatHistory: React.FC<ChatHistoryProps> = ({ history }) => {
+const ChatHistory: React.FC<ChatHistoryProps> = React.memo(({ history }) => {
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
       {history.map((message) => {
@@ -28,17 +29,25 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ history }) => {
           );
         } else if (message.type === "question") {
           return (
-            <div key={message.id} className={styles.questionContainer}>
+            <ScaleMessage
+              key={message.id}
+              origin="top-left"
+              className={styles.questionContainer}
+            >
               <Markdown className={styles.question}>
                 {typeof message.text === "string" ? message.text : ""}
               </Markdown>
-            </div>
+            </ScaleMessage>
           );
         } else if (message.type === "answer") {
           return (
-            <div key={message.id} className={styles.answerContainer}>
+            <ScaleMessage
+              key={message.id}
+              origin="top-right"
+              className={styles.answerContainer}
+            >
               <p className={styles.answer}>{message.text}</p>
-            </div>
+            </ScaleMessage>
           );
         } else {
           return (
@@ -50,5 +59,5 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ history }) => {
       })}
     </div>
   );
-};
-export default memo(ChatHistory);
+});
+export default ChatHistory;

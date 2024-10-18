@@ -2,6 +2,7 @@
 import React, { useEffect, useRef } from "react";
 import { ToastContainer } from "react-toastify";
 import { useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 // components
 import { toggleChatbot } from "./ChatbotUtils";
@@ -45,6 +46,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
 
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const memoizedCurrentNode = useMemo(() => currentNode, [currentNode]);
+  const memoizedHistory = useMemo(() => messages, [messages]); //un-memoize messages to try and make it work
 
   // const chatbotTree = useSelector((state: RootState) => state.chatbot.tree);
   useEffect(() => {
@@ -55,7 +57,8 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
   }, [messages]);
   return (
     <>
-      <ToastContainer /> {/*  Pops up if invalid categoryId is entered*/}
+      <ToastContainer />{" "}
+      {/*  Pops up if invalid categoryId is entered in CategoryIdInput component*/}
       <ChatbotIcon
         toggleChatbot={toggleChatbot}
         dispatch={dispatch}
@@ -63,38 +66,47 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
         chatbotOpen={chatbotOpen}
         setChatbotOpen={setChatbotOpen}
       />
-      {chatbotOpen && (
-        <div className={styles.chatbotWindow}>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-            }}
+      <AnimatePresence>
+        {chatbotOpen && (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0 }}
+            transition={{ duration: 0.17, ease: "easeInOut" }}
+            style={{ transformOrigin: "bottom right" }}
+            className={styles.chatbotWindow}
           >
-            {isOpen ? (
-              <UserDataModal
-                dispatch={dispatch}
-                isOpen={isOpen}
-                userData={userData}
-                onClose={closeModal}
-              />
-            ) : null}
-          </div>
-          <ChatbotHeader />
-          <div className={styles.chatbotBody} ref={chatContainerRef}>
-            <ChatHistory history={messages} />
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              {isOpen ? (
+                <UserDataModal
+                  dispatch={dispatch}
+                  isOpen={isOpen}
+                  userData={userData}
+                  onClose={closeModal}
+                />
+              ) : null}
+            </div>
+            <ChatbotHeader />
+            <div className={styles.chatbotBody} ref={chatContainerRef}>
+              <ChatHistory history={memoizedHistory} />
 
-            <ChatbotBody
-              dispatch={dispatch}
-              memoizedCurrentNode={memoizedCurrentNode}
-              handleOptionClick={handleOptionClick}
-              questionFunnel={questionFunnel}
-              userData={userData}
-            />
-          </div>
-          <UserInputField categoryId={categoryId} />
-        </div>
-      )}
+              <ChatbotBody
+                dispatch={dispatch}
+                memoizedCurrentNode={memoizedCurrentNode}
+                handleOptionClick={handleOptionClick}
+                questionFunnel={questionFunnel}
+                userData={userData}
+              />
+            </div>
+            <UserInputField categoryId={categoryId} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };

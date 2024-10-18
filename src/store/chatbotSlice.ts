@@ -31,8 +31,14 @@ const chatbotSlice = createSlice({
       state.questionFunnel = action.payload; // Update validation message state
     },
     addMessage: (state, action: PayloadAction<ChatMessage>) => {
-      state.messages.push(action.payload);
+      const newMessage = action.payload;
+
+      return {
+        ...state,
+        messages: state.messages.concat(newMessage),
+      };
     },
+
     setCurrentInput: (state, action: PayloadAction<string>) => {
       state.currentInput = action.payload;
     },
