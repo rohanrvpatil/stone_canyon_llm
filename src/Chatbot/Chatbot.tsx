@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 
 // components
 import { toggleChatbot } from "./ChatbotUtils";
-import { handleOptionClick } from "./ChatbotInput";
 import UserDataModal from "./UserDataModal";
 import UserInputField from "./UserInputField";
 // import { createChatbotTree } from "./ChatbotTree";
@@ -37,15 +36,11 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
   const currentNode = useSelector(
     (state: RootState) => state.chatbot.currentNode
   );
-  const questionFunnel = useSelector(
-    (state: RootState) => state.chatbot.questionFunnel
-  );
   const userData = useSelector((state: RootState) => state.user);
   const messages = useSelector((state: RootState) => state.chatbot.messages);
   const isOpen = useSelector((state: any) => state.modal.isOpen);
 
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
-  const memoizedCurrentNode = useMemo(() => currentNode, [currentNode]);
   const memoizedHistory = useMemo(() => messages, [messages]); //un-memoize messages to try and make it work
 
   // const chatbotTree = useSelector((state: RootState) => state.chatbot.tree);
@@ -119,14 +114,6 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
             <ChatbotHeader />
             <div className={styles.chatbotBody} ref={chatContainerRef}>
               <ChatHistory history={memoizedHistory} />
-
-              {/* <ChatbotBody
-                dispatch={dispatch}
-                memoizedCurrentNode={memoizedCurrentNode}
-                handleOptionClick={handleOptionClick}
-                questionFunnel={questionFunnel}
-                userData={userData}
-              /> */}
             </div>
             <UserInputField categoryId={categoryId} />
           </motion.div>
