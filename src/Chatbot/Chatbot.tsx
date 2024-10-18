@@ -24,7 +24,7 @@ import { closeModal } from "../store/modalSlice";
 import { ChatbotProps } from "../interfaces/chatbotInterfaces";
 import ChatbotHeader from "./ChatbotHeader";
 import ChatbotIcon from "./ChatbotIcon";
-import ChatbotBody from "./ChatbotBody";
+// import ChatbotBody from "./ChatbotBody";
 import ChatHistory from "./ChatHistory";
 
 const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
