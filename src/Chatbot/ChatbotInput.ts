@@ -44,23 +44,23 @@ export const handleOptionClick = async (
   if (currentNode && currentNode.options[option]) {
     const nextNode = currentNode.options[option] as ChatbotNode;
 
-    dispatch(
-      addMessage({
-        id: `question-${Date.now()}`,
-        text: currentNode.question,
-        isUser: false,
-        type: "question",
-      })
-    );
+    // dispatch(
+    //   addMessage({
+    //     id: `question-${Date.now()}`,
+    //     text: currentNode.question,
+    //     isUser: false,
+    //     type: "question",
+    //   })
+    // );
 
-    dispatch(
-      addMessage({
-        id: `options-${Date.now()}`,
-        text: Object.keys(currentNode.options), // Assuming you want to store options as an array
-        isUser: false,
-        type: "options",
-      })
-    );
+    // dispatch(
+    //   addMessage({
+    //     id: `options-${Date.now()}`,
+    //     text: Object.keys(currentNode.options),
+    //     isUser: false,
+    //     type: "options",
+    //   })
+    // );
     dispatch(
       addMessage({
         id: `user-${Date.now()}`,
@@ -78,6 +78,7 @@ export const handleOptionClick = async (
       !nextNode.options ||
       Object.keys(nextNode.options).length === 0
     ) {
+      dispatch(setCurrentNode(null));
       fetchUserDataQuestions(dispatch);
       const serviceId = await updateServiceId(
         questionFunnel + newQuestionFunnel
@@ -114,20 +115,18 @@ export const handleUserInput = async (
     handleUserInputValidation(
       dispatch,
       currentInput,
-      currentNode,
       currentQuestionKey,
       currentInputIndex
     );
   }
   // when user enters anything which includes "help"
   if (currentInput.toLowerCase().includes("help")) {
-    let newNode = createChatbotNode("Preparing response...");
-    dispatch(setCurrentNode(newNode));
+    // let newNode = createChatbotNode("Preparing response...");
+    // dispatch(setCurrentNode(newNode));
 
     await handleWordHelp({
       dispatch,
       currentInput,
-      currentNode,
       categoryId,
       GEMINI_API_KEY,
     });
@@ -191,22 +190,22 @@ export const handleUserInput = async (
           return;
         }
       } else {
-        dispatch(
-          addMessage({
-            id: `question-${Date.now()}`,
-            text: currentNode!.question,
-            isUser: false,
-            type: "question",
-          })
-        );
-        dispatch(
-          addMessage({
-            id: `options-${Date.now()}`,
-            text: Object.keys(currentNode.options),
-            isUser: false,
-            type: "options",
-          })
-        );
+        // dispatch(
+        //   addMessage({
+        //     id: `question-${Date.now()}`,
+        //     text: currentNode!.question,
+        //     isUser: false,
+        //     type: "question",
+        //   })
+        // );
+        // dispatch(
+        //   addMessage({
+        //     id: `options-${Date.now()}`,
+        //     text: Object.keys(currentNode.options),
+        //     isUser: false,
+        //     type: "options",
+        //   })
+        // );
         dispatch(
           addMessage({
             id: `error-${Date.now()}`,

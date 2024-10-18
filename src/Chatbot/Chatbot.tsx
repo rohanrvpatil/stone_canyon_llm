@@ -17,7 +17,7 @@ import styles from "./Chatbot.module.css";
 // Redux
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store";
-import { setChatbotOpen } from "../store/chatbotSlice";
+import { setChatbotOpen, addMessage } from "../store/chatbotSlice";
 import { closeModal } from "../store/modalSlice";
 
 // interfaces
@@ -55,6 +55,31 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
         chatContainerRef.current.scrollHeight;
     }
   }, [messages]);
+
+  useEffect(() => {
+    if (currentNode) {
+      dispatch(
+        addMessage({
+          id: `question-${Date.now()}`,
+          text: currentNode.question,
+          isUser: false,
+          type: "question",
+        })
+      );
+
+      if (currentNode.options && Object.keys(currentNode.options).length > 0) {
+        dispatch(
+          addMessage({
+            id: `options-${Date.now()}`,
+            text: Object.keys(currentNode.options),
+            isUser: false,
+            type: "options",
+          })
+        );
+      }
+    }
+  }, [currentNode, dispatch]); // Runs whenever the currentNode changes
+
   return (
     <>
       <ToastContainer />{" "}
@@ -95,13 +120,13 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
             <div className={styles.chatbotBody} ref={chatContainerRef}>
               <ChatHistory history={memoizedHistory} />
 
-              <ChatbotBody
+              {/* <ChatbotBody
                 dispatch={dispatch}
                 memoizedCurrentNode={memoizedCurrentNode}
                 handleOptionClick={handleOptionClick}
                 questionFunnel={questionFunnel}
                 userData={userData}
-              />
+              /> */}
             </div>
             <UserInputField categoryId={categoryId} />
           </motion.div>

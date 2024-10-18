@@ -1,7 +1,7 @@
 // ChatbotBody.tsx
 // import { memo } from "react";
 import React from "react";
-import Markdown from "markdown-to-jsx";
+// import Markdown from "markdown-to-jsx";
 import styles from "./Chatbot.module.css"; // Adjust this path if necessary
 import { ChatbotNode, UserData } from "../interfaces";
 import ScaleMessage from "./ScaleMessage";
@@ -28,45 +28,32 @@ const ChatbotBody: React.FC<ChatbotBodyProps> = React.memo(
     userData,
   }) => (
     <>
-      {memoizedCurrentNode &&
-        Object.keys(memoizedCurrentNode.options).length > 0 && (
-          <>
-            <ScaleMessage
-              origin="top-left"
-              className={styles.questionContainer}
+      <ScaleMessage origin="top-left" className={styles.questionContainer}>
+        <p className={styles.question}>{memoizedCurrentNode!.question}</p>
+      </ScaleMessage>
+
+      {Object.keys(memoizedCurrentNode!.options).length > 0 && (
+        <ScaleMessage origin="top-left" className={styles.optionsContainer}>
+          {Object.keys(memoizedCurrentNode!.options).map((option, index) => (
+            <button
+              key={option}
+              onClick={() =>
+                handleOptionClick(
+                  dispatch,
+                  memoizedCurrentNode,
+                  option,
+                  questionFunnel,
+                  userData
+                )
+              }
+              className={styles.option}
             >
-              <p className={styles.question}>{memoizedCurrentNode.question}</p>
-            </ScaleMessage>
-            <ScaleMessage origin="top-left" className={styles.optionsContainer}>
-              {Object.keys(memoizedCurrentNode.options).map((option, index) => (
-                <button
-                  key={option}
-                  onClick={() =>
-                    handleOptionClick(
-                      dispatch,
-                      memoizedCurrentNode,
-                      option,
-                      questionFunnel,
-                      userData
-                    )
-                  }
-                  className={styles.option}
-                >
-                  {`${index + 1}. `}
-                  {option}
-                </button>
-              ))}
-            </ScaleMessage>
-          </>
-        )}
-      {memoizedCurrentNode &&
-        Object.keys(memoizedCurrentNode.options).length === 0 && (
-          <ScaleMessage origin="top-left" className={styles.questionContainer}>
-            <Markdown className={styles.question}>
-              {memoizedCurrentNode.question}
-            </Markdown>
-          </ScaleMessage>
-        )}
+              {`${index + 1}. `}
+              {option}
+            </button>
+          ))}
+        </ScaleMessage>
+      )}
     </>
   )
 );

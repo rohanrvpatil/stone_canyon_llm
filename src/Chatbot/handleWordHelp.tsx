@@ -12,7 +12,6 @@ export const createChatbotNode = (question: string): ChatbotNode => ({
 interface HandleUserInputParams {
   dispatch: Dispatch;
   currentInput: string;
-  currentNode: any; // Replace with the correct type
   categoryId: number; // Adjust type as needed
   GEMINI_API_KEY: string; // Add type for API key
 }
@@ -27,19 +26,19 @@ interface HandleUserInputParams {
 const handleWordHelp = async ({
   dispatch,
   currentInput,
-  currentNode,
+  // currentNode,
   categoryId,
   GEMINI_API_KEY,
 }: HandleUserInputParams) => {
   // Dispatch the user's question
-  dispatch(
-    addMessage({
-      id: `question-${Date.now()}`,
-      text: currentNode!.question,
-      isUser: false,
-      type: "question",
-    })
-  );
+  // dispatch(
+  //   addMessage({
+  //     id: `question-${Date.now()}`,
+  //     text: currentNode!.question,
+  //     isUser: false,
+  //     type: "question",
+  //   })
+  // );
   dispatch(
     addMessage({
       id: `user-${Date.now()}`,
@@ -61,14 +60,14 @@ const handleWordHelp = async ({
   dispatch(setCurrentNode(newNode));
 
   // Dispatch the bot's question
-  dispatch(
-    addMessage({
-      id: `question-${Date.now()}`,
-      text: botMessage,
-      isUser: false,
-      type: "question",
-    })
-  );
+  // dispatch(
+  //   addMessage({
+  //     id: `question-${Date.now()}`,
+  //     text: botMessage,
+  //     isUser: false,
+  //     type: "question",
+  //   })
+  // );
 
   // Fetch the category tree
   fetchCategoryTree(dispatch, categoryId);

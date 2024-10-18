@@ -11,7 +11,7 @@ import {
   validateZipCode,
   validateFullAddress,
 } from "./userInputValidation";
-import { ChatbotNode } from "../interfaces/chatbotInterfaces";
+// import { ChatbotNode } from "../interfaces/chatbotInterfaces";
 import { createChatbotNode } from "./ChatbotInput";
 import userDataQuestions from "../../backend/data/userDataQuestions.json";
 import { openModal } from "../store/modalSlice";
@@ -25,7 +25,7 @@ import { openModal } from "../store/modalSlice";
 const handleUserInputValidation = (
   dispatch: Dispatch,
   currentInput: string,
-  currentNode: ChatbotNode | null,
+  // currentNode: ChatbotNode | null,
   currentQuestionKey: string,
   currentInputIndex: number
 ) => {
@@ -53,14 +53,14 @@ const handleUserInputValidation = (
   }
 
   // Dispatch the question message
-  dispatch(
-    addMessage({
-      id: `question-${Date.now()}`,
-      text: currentNode!.question,
-      isUser: false,
-      type: "question",
-    })
-  );
+  // dispatch(
+  //   addMessage({
+  //     id: `question-${Date.now()}`,
+  //     text: currentNode!.question,
+  //     isUser: false,
+  //     type: "question",
+  //   })
+  // );
   dispatch(
     addMessage({
       id: `user-${Date.now()}`,
