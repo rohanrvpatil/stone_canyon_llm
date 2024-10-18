@@ -18,6 +18,9 @@ padding-bottom: 6px;
   align-items: center;
   justify-content: center;
   box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.3);
+
+  transition: transform 0.3s ease, opacity 0.3s ease; /* Smooth transition */
+  cursor: pointer; /* Changes the cursor to a pointer */
 }
 
 .chatbotIcon:hover {

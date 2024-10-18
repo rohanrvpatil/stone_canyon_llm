@@ -1,5 +1,8 @@
-// ChatbotIcon.tsx
+// icons
 import ForumSharpIcon from "@mui/icons-material/ForumSharp";
+import CloseIcon from "@mui/icons-material/Close";
+
+// styles
 import styles from "./Chatbot.module.css";
 
 type SetChatbotOpenType = (isOpen: boolean) => {
@@ -7,7 +10,7 @@ type SetChatbotOpenType = (isOpen: boolean) => {
   payload: boolean;
 };
 
-interface ChatbotIconProps {
+export interface ChatbotIconProps {
   toggleChatbot: (
     dispatch: any,
     categoryId: number,
@@ -33,7 +36,11 @@ const ChatbotIcon: React.FC<ChatbotIconProps> = ({
       toggleChatbot(dispatch, categoryId, chatbotOpen, setChatbotOpen)
     }
   >
-    <ForumSharpIcon fontSize="large" sx={{ color: "white" }} />
+    {chatbotOpen ? (
+      <CloseIcon fontSize="large" sx={{ color: "white" }} />
+    ) : (
+      <ForumSharpIcon fontSize="large" sx={{ color: "white" }} />
+    )}
   </div>
 );
 

@@ -11,21 +11,13 @@ import {
   validateZipCode,
   validateFullAddress,
 } from "./userInputValidation";
-// import { ChatbotNode } from "../interfaces/chatbotInterfaces";
 import { createChatbotNode } from "./ChatbotInput";
 import userDataQuestions from "../../backend/data/userDataQuestions.json";
 import { openModal } from "../store/modalSlice";
 
-// const batchAddMessages = (dispatch: any, messages: any[]) => {
-//   messages.forEach((message) => {
-//     dispatch(message);
-//   });
-// };
-
 const handleUserInputValidation = (
   dispatch: Dispatch,
   currentInput: string,
-  // currentNode: ChatbotNode | null,
   currentQuestionKey: string,
   currentInputIndex: number
 ) => {
@@ -52,15 +44,6 @@ const handleUserInputValidation = (
       break;
   }
 
-  // Dispatch the question message
-  // dispatch(
-  //   addMessage({
-  //     id: `question-${Date.now()}`,
-  //     text: currentNode!.question,
-  //     isUser: false,
-  //     type: "question",
-  //   })
-  // );
   dispatch(
     addMessage({
       id: `user-${Date.now()}`,
@@ -70,7 +53,6 @@ const handleUserInputValidation = (
     })
   );
 
-  // If there's an error message, dispatch it
   if (errorMessage) {
     dispatch(
       addMessage({
@@ -81,7 +63,7 @@ const handleUserInputValidation = (
       })
     );
 
-    return; // Exit the function if there's an error
+    return;
   }
 
   if (currentInputIndex < userDataQuestions.length - 1) {
