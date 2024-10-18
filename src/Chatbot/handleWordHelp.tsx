@@ -17,11 +17,11 @@ interface HandleUserInputParams {
   GEMINI_API_KEY: string; // Add type for API key
 }
 
-const batchAddMessages = (dispatch: any, messages: any[]) => {
-  messages.forEach((message) => {
-    dispatch(message);
-  });
-};
+// const batchAddMessages = (dispatch: any, messages: any[]) => {
+//   messages.forEach((message) => {
+//     dispatch(message);
+//   });
+// };
 
 // Create a function to handle user input
 const handleWordHelp = async ({
@@ -32,22 +32,22 @@ const handleWordHelp = async ({
   GEMINI_API_KEY,
 }: HandleUserInputParams) => {
   // Dispatch the user's question
-  const messagesToAdd = [
+  dispatch(
     addMessage({
       id: `question-${Date.now()}`,
       text: currentNode!.question,
       isUser: false,
       type: "question",
-    }),
+    })
+  );
+  dispatch(
     addMessage({
       id: `user-${Date.now()}`,
       text: currentInput,
       isUser: true,
       type: "answer",
-    }),
-  ];
-
-  batchAddMessages(dispatch, messagesToAdd);
+    })
+  );
 
   // Send the input to the chatbot
   let botMessage = await sendMessageToChatbot(

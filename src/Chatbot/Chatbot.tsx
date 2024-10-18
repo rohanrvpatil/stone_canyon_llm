@@ -24,6 +24,7 @@ import { ChatbotProps } from "../interfaces/chatbotInterfaces";
 import ChatbotHeader from "./ChatbotHeader";
 import ChatbotIcon from "./ChatbotIcon";
 import ChatbotBody from "./ChatbotBody";
+import ChatHistory from "./ChatHistory";
 
 const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
   // state
@@ -80,14 +81,17 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
             ) : null}
           </div>
           <ChatbotHeader />
-          <ChatbotBody
-            dispatch={dispatch}
-            memoizedCurrentNode={memoizedCurrentNode}
-            handleOptionClick={handleOptionClick}
-            questionFunnel={questionFunnel}
-            userData={userData}
-          />
+          <div className={styles.chatbotBody} ref={chatContainerRef}>
+            <ChatHistory history={messages} />
 
+            <ChatbotBody
+              dispatch={dispatch}
+              memoizedCurrentNode={memoizedCurrentNode}
+              handleOptionClick={handleOptionClick}
+              questionFunnel={questionFunnel}
+              userData={userData}
+            />
+          </div>
           <UserInputField categoryId={categoryId} />
         </div>
       )}

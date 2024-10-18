@@ -16,11 +16,11 @@ import { createChatbotNode } from "./ChatbotInput";
 import userDataQuestions from "../../backend/data/userDataQuestions.json";
 import { openModal } from "../store/modalSlice";
 
-const batchAddMessages = (dispatch: any, messages: any[]) => {
-  messages.forEach((message) => {
-    dispatch(message);
-  });
-};
+// const batchAddMessages = (dispatch: any, messages: any[]) => {
+//   messages.forEach((message) => {
+//     dispatch(message);
+//   });
+// };
 
 const handleUserInputValidation = (
   dispatch: Dispatch,
@@ -53,22 +53,22 @@ const handleUserInputValidation = (
   }
 
   // Dispatch the question message
-  const messagesToAdd = [
+  dispatch(
     addMessage({
       id: `question-${Date.now()}`,
       text: currentNode!.question,
       isUser: false,
       type: "question",
-    }),
+    })
+  );
+  dispatch(
     addMessage({
       id: `user-${Date.now()}`,
       text: currentInput,
       isUser: true,
       type: "answer",
-    }),
-  ];
-
-  batchAddMessages(dispatch, messagesToAdd);
+    })
+  );
 
   // If there's an error message, dispatch it
   if (errorMessage) {

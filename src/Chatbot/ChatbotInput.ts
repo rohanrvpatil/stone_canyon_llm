@@ -27,11 +27,11 @@ export const createChatbotNode = (question: string): ChatbotNode => ({
   options: {},
 });
 
-const batchAddMessages = (dispatch: any, messages: any[]) => {
-  messages.forEach((message) => {
-    dispatch(addMessage(message));
-  });
-};
+// const batchAddMessages = (dispatch: any, messages: any[]) => {
+//   messages.forEach((message) => {
+//     dispatch(addMessage(message));
+//   });
+// };
 
 export const handleOptionClick = async (
   dispatch: any,
@@ -43,29 +43,31 @@ export const handleOptionClick = async (
   if (currentNode && currentNode.options[option]) {
     const nextNode = currentNode.options[option] as ChatbotNode;
 
-    const messagesToAdd = [
+    dispatch(
       addMessage({
         id: `question-${Date.now()}`,
         text: currentNode.question,
         isUser: false,
         type: "question",
-      }),
+      })
+    );
+
+    dispatch(
       addMessage({
         id: `options-${Date.now()}`,
         text: Object.keys(currentNode.options), // Assuming you want to store options as an array
         isUser: false,
         type: "options",
-      }),
+      })
+    );
+    dispatch(
       addMessage({
         id: `user-${Date.now()}`,
         text: option,
         isUser: true,
         type: "answer",
-      }),
-    ];
-
-    batchAddMessages(dispatch, messagesToAdd);
-
+      })
+    );
     dispatch(setCurrentNode(nextNode));
 
     let newQuestionFunnel = currentNode.question + " > " + option;
@@ -188,27 +190,30 @@ export const handleUserInput = async (
           return;
         }
       } else {
-        const messagesToAdd = [
+        dispatch(
           addMessage({
             id: `question-${Date.now()}`,
             text: currentNode!.question,
             isUser: false,
             type: "question",
-          }),
+          })
+        );
+        dispatch(
           addMessage({
             id: `options-${Date.now()}`,
             text: Object.keys(currentNode.options),
             isUser: false,
             type: "options",
-          }),
+          })
+        );
+        dispatch(
           addMessage({
             id: `error-${Date.now()}`,
             text: "No option is closely matching your input. Please try again",
             isUser: false,
             type: "error",
-          }),
-        ];
-        batchAddMessages(dispatch, messagesToAdd);
+          })
+        );
 
         // return;
       }

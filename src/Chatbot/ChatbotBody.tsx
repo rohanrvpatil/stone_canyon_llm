@@ -25,7 +25,7 @@ const ChatbotBody: React.FC<ChatbotBodyProps> = ({
   questionFunnel,
   userData,
 }) => (
-  <div className={styles.chatbotBody}>
+  <>
     {memoizedCurrentNode &&
       Object.keys(memoizedCurrentNode.options).length > 0 && (
         <>
@@ -62,7 +62,7 @@ const ChatbotBody: React.FC<ChatbotBodyProps> = ({
           </Markdown>
         </div>
       )}
-  </div>
+  </>
 );
 
 export default memo(ChatbotBody);
