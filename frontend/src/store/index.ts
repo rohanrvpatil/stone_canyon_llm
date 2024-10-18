@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import chatbotReducer from "./chatbotSlice";
+import chatbotReducer from "./chatbotSlice.ts";
 import userReducer from "./userSlice.ts";
 import modalReducer from "./modalSlice.ts";
 

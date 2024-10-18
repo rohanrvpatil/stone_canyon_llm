@@ -11,7 +11,7 @@ import {
 import { setUserData } from "../store/userSlice";
 
 // components
-import userDataQuestions from "../../backend/data/userDataQuestions.json";
+import userDataQuestions from "../../../backend/data/userDataQuestions.json";
 import handleUserInputValidation from "./handleUserInputValidation";
 import handleWordHelp from "./handleWordHelp";
 

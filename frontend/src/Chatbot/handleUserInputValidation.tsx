@@ -12,7 +12,7 @@ import {
   validateFullAddress,
 } from "./userInputValidation";
 import { createChatbotNode } from "./ChatbotInput";
-import userDataQuestions from "../../backend/data/userDataQuestions.json";
+import userDataQuestions from "../../../backend/data/userDataQuestions.json";
 import { openModal } from "../store/modalSlice";
 
 const handleUserInputValidation = (
