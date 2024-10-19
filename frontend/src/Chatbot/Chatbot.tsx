@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toggleChatbot } from "./ChatbotUtils";
 import UserDataModal from "./UserDataModal";
 import UserInputField from "./UserInputField";
+import { handleOptionClick } from "./ChatbotInput";
 // import { createChatbotTree } from "./ChatbotTree";
 
 // styles
@@ -41,6 +42,9 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
   const isOpen = useSelector((state: any) => state.modal.isOpen);
   const isInitialized = useSelector(
     (state: RootState) => state.chatbot.isInitialized
+  );
+  const questionFunnel = useSelector(
+    (state: RootState) => state.chatbot.questionFunnel
   );
 
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
@@ -124,7 +128,14 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
             </div>
             <ChatbotHeader />
             <div className={styles.chatbotBody} ref={chatContainerRef}>
-              <ChatHistory history={memoizedHistory} />
+              <ChatHistory
+                history={memoizedHistory}
+                handleOptionClick={handleOptionClick} // Pass the function
+                dispatch={dispatch}
+                currentNode={currentNode}
+                questionFunnel={questionFunnel}
+                userData={userData}
+              />
             </div>
             <UserInputField categoryId={categoryId} />
           </motion.div>

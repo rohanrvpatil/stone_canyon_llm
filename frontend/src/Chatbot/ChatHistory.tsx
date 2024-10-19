@@ -8,7 +8,28 @@ import { SlideLeft, SlideRight } from "./Slide";
 // interfaces
 import { ChatHistoryProps } from "../interfaces";
 
-const ChatHistory: React.FC<ChatHistoryProps> = React.memo(({ history }) => {
+const ChatHistory: React.FC<
+  ChatHistoryProps & {
+    handleOptionClick: (
+      dispatch: any,
+      currentNode: any,
+      option: string,
+      questionFunnel: string,
+      userData: any
+    ) => void;
+    dispatch: any;
+    currentNode: any;
+    questionFunnel: string;
+    userData: any;
+  }
+> = ({
+  history,
+  handleOptionClick,
+  dispatch,
+  currentNode,
+  questionFunnel,
+  userData,
+}) => {
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
       {history.map((message) => {
@@ -20,6 +41,15 @@ const ChatHistory: React.FC<ChatHistoryProps> = React.memo(({ history }) => {
                   <button
                     key={`${message.id}-option-${option}-${idx}`}
                     className={styles.option}
+                    onClick={() =>
+                      handleOptionClick(
+                        dispatch,
+                        currentNode,
+                        option,
+                        questionFunnel,
+                        userData
+                      )
+                    }
                   >
                     {`${idx + 1}. `}
                     {option}
@@ -54,5 +84,5 @@ const ChatHistory: React.FC<ChatHistoryProps> = React.memo(({ history }) => {
       })}
     </div>
   );
-});
+};
 export default ChatHistory;
