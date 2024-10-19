@@ -12,7 +12,7 @@ type SetChatbotOpenType = (isOpen: boolean) => {
   payload: boolean;
 };
 import { ChatbotNode } from "../interfaces";
-import { setCurrentNode } from "../store/chatbotSlice";
+import { setCurrentNode, setIsInitialized } from "../store/chatbotSlice";
 
 export const createChatbotNode = (question: string): ChatbotNode => ({
   question,
@@ -23,13 +23,17 @@ export const toggleChatbot = async (
   dispatch: any,
   categoryId: number,
   chatbotOpen: boolean,
-  setChatbotOpen: SetChatbotOpenType
+  setChatbotOpen: SetChatbotOpenType,
+  isInitialized: boolean
 ) => {
   if (categoryId >= 1 && categoryId <= 7) {
-    const newNode = createChatbotNode(
-      "Hello there! 👋 I'm happy to be here. What can I do for you today? 😊"
-    );
-    dispatch(setCurrentNode(newNode));
+    if (!isInitialized) {
+      const newNode = createChatbotNode(
+        "Hello there! 👋 I'm happy to be here. What can I do for you today? 😊"
+      );
+      dispatch(setCurrentNode(newNode));
+      dispatch(setIsInitialized(true)); // Set the chatbot as initialized
+    }
 
     dispatch(setChatbotOpen(!chatbotOpen));
   } else {

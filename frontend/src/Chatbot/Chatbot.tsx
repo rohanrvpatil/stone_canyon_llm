@@ -39,6 +39,9 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
   const userData = useSelector((state: RootState) => state.user);
   const messages = useSelector((state: RootState) => state.chatbot.messages);
   const isOpen = useSelector((state: any) => state.modal.isOpen);
+  const isInitialized = useSelector(
+    (state: RootState) => state.chatbot.isInitialized
+  );
 
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const memoizedHistory = useMemo(() => messages, [messages]); //un-memoize messages to try and make it work
@@ -77,10 +80,18 @@ const Chatbot: React.FC<ChatbotProps> = ({ categoryId }) => {
 
   return (
     <>
-      <ToastContainer />{" "}
+      <ToastContainer />
       {/*  Pops up if invalid categoryId is entered in CategoryIdInput component*/}
       <ChatbotIcon
-        toggleChatbot={toggleChatbot}
+        toggleChatbot={() =>
+          toggleChatbot(
+            dispatch,
+            categoryId,
+            chatbotOpen,
+            setChatbotOpen,
+            isInitialized
+          )
+        }
         dispatch={dispatch}
         categoryId={categoryId}
         chatbotOpen={chatbotOpen}

@@ -6,6 +6,7 @@ export interface ChatbotState {
   currentInput: string;
   currentInputIndex: number;
   chatbotTree: ChatbotNode | null;
+  isInitialized: boolean;
 }
 
 export interface ChatbotNode {

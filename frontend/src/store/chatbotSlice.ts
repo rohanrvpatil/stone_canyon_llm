@@ -15,6 +15,7 @@ const initialState: ChatbotState = {
   currentInput: "",
   currentInputIndex: 0,
   chatbotTree: null,
+  isInitialized: false,
 };
 
 const chatbotSlice = createSlice({
@@ -48,6 +49,9 @@ const chatbotSlice = createSlice({
     setCurrentInputIndex(state, action: PayloadAction<number>) {
       state.currentInputIndex = action.payload;
     },
+    setIsInitialized(state, action: PayloadAction<boolean>) {
+      state.isInitialized = action.payload;
+    },
   },
 });
 
@@ -59,6 +63,7 @@ export const {
   setCurrentInput,
   setChatbotTree,
   setCurrentInputIndex,
+  setIsInitialized,
 } = chatbotSlice.actions;
 
 export default chatbotSlice.reducer;

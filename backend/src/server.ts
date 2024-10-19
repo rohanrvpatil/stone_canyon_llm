@@ -70,7 +70,7 @@ app.get("/fetch-category-data", async (req, res) => {
       "Category ID": Number(categoryId),
     }).exec();
 
-    console.log(`Matched result: ${result}`);
+    // console.log(`Matched result: ${result}`);
 
     res.json(result);
   } catch (error) {
