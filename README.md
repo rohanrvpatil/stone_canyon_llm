@@ -8,6 +8,7 @@ A LLM powered service-oriented chatbot which can run decision trees and gather i
 2. State Management: Redux
 3. Database: MongoDB
 4. Animations: framer-motion
+5. Backend: Node.js
 
 ## Features:
 
